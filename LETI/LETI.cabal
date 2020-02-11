@@ -67,4 +67,11 @@ executable LETI
   
   -- Base language which the package is written in.
   default-language:    Haskell2010
-  
+
+
+Test-Suite test-valueOf
+    default-language:    Haskell2010
+    type:       exitcode-stdio-1.0
+    main-is:    TestValueOf.hs
+    hs-source-dirs:      src
+    build-depends:       base >=4.9 && <4.10, containers, mtl

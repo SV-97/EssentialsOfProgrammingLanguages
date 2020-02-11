@@ -1,14 +1,19 @@
 module ExpVal where
 
 data ExpVal
-  = NumVal Int
-  | BoolVal Bool
+  = Num Int
+  | Bool Bool
+  | List [ExpVal]
   deriving (Eq, Show)
 
-expValToNum :: ExpVal -> Maybe Int
-expValToNum (NumVal n) = Just n
-expValToNum _          = Nothing
+toNum :: ExpVal -> Maybe Int
+toNum (Num n) = Just n
+toNum _       = Nothing
 
-expValToBool :: ExpVal -> Maybe Bool
-expValToBool (BoolVal b) = Just b
-expValToBool _           = Nothing
+toBool :: ExpVal -> Maybe Bool
+toBool (Bool b) = Just b
+toBool _        = Nothing
+
+toList :: ExpVal -> Maybe [ExpVal]
+toList (List l) = Just l
+toList _        = Nothing

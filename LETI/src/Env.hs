@@ -21,13 +21,11 @@ extend :: Var -> ExpVal -> State Env ()
 extend key value = do
   ρ1 <- get
   put $ Map.insert key value ρ1
-  -- return ()
 
 extendList :: [(Var, ExpVal)] -> State Env ()
 extendList lst = do
   old <- get
   put $ Map.union (Map.fromList lst) old
-  -- return ()
 
 apply :: Var -> State Env (Maybe ExpVal)
 apply var = do
