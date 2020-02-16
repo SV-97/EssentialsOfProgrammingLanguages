@@ -7,7 +7,9 @@ main :: IO ()
 main = print $ eval Map.empty program
 
 {-
-let add = \a -> \b -> a - (0 - b) in add 5 10
+let add = \a -> \b -> a - (0 - b)
+in let sum l = if isEmpty l then 0 else add (head l) (sum (tail l))
+  in sum (1:2:3[])
 -}
 program =
   Let

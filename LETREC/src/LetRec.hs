@@ -12,22 +12,31 @@ data Value
   | Bool Bool
   | List [Value]
   | Closure Env Var Expr
+  | VFix Env Var Expr
   deriving (Eq, Show)
 
+fix :: Value -> Maybe Value
+fix f@(VFix env var expr) = snd $ valueOf (extend env var f) expr
+fix _                     = Nothing
+
 toInt :: Value -> Maybe Int
-toInt (Num n) = Just n
-toInt _       = Nothing
+toInt (Num n)   = Just n
+toInt f@VFix {} = fix f >>= toInt
+toInt _         = Nothing
 
 toBool :: Value -> Maybe Bool
-toBool (Bool b) = Just b
-toBool _        = Nothing
+toBool (Bool b)  = Just b
+toBool f@VFix {} = fix f >>= toBool
+toBool _         = Nothing
 
 toList :: Value -> Maybe [Value]
-toList (List l) = Just l
-toList _        = Nothing
+toList (List l)  = Just l
+toList f@VFix {} = fix f >>= toList
+toList _         = Nothing
 
 toProcComponents :: Value -> Maybe (Env, Var, Expr)
 toProcComponents (Closure env var expr) = Just (env, var, expr)
+toProcComponents f@VFix {}              = fix f >>= toProcComponents
 toProcComponents _                      = Nothing
 
 type Env = Map Var Value
@@ -58,6 +67,7 @@ data Expr
   | IsEmpty Expr
   | Lambda Var Expr
   | Application Expr Expr
+  | Fix Var Expr
   | LetRec Var Expr Expr
   deriving (Eq, Show)
 
@@ -116,10 +126,9 @@ valueOf r1 (Application expr1 expr2) =
     val2 <- eval r1 expr2
     let r2 = extend fEnv fVar val2
     eval r2 fBody
+valueOf r1 (Fix var expr) = valueOf (extend r1 var (VFix r1 var expr)) expr
 valueOf r1 (LetRec var boundVal body) =
-  r1 $. do
-    let r2 = extend r1 var (Closure r2 var boundVal)
-    eval r2 body
+  valueOf r1 (Let var (Fix var boundVal) body)
 --valueOf r1 (LetRec var expr1 body) = valueOf r2 body
 --  where
 --    r2 = extendRec r1 var binding body
